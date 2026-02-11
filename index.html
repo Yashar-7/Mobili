@@ -3,192 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mobili Showroom 3D</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>Mobili Showroom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
-        :root { --blue-mobili: #004a99; --brand-dark: #1a1a1a; --bg-light: #f8f8f8; }
+        :root { --blue: #004a99; --dark: #1a1a1a; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg-light); color: var(--brand-dark); font-family: 'Montserrat', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
+        body { background: #fdfdfd; font-family: 'Montserrat', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* SPLASH SCREEN (Las Puertas) */
+        /* SPLASH DE ENTRADA */
         #splash {
-            position: fixed; inset: 0; z-index: 2000; display: flex;
-            background: var(--bg-light); cursor: pointer; transition: 1s ease-in-out;
+            position: fixed; inset: 0; z-index: 2000; display: flex; transition: 1s ease-in-out;
         }
         .door {
-            flex: 1; height: 100%; border: 1px solid #ddd;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: 1.2s cubic-bezier(0.7, 0, 0.3, 1); background: #ffffff;
+            flex: 1; height: 100%; background: #fff; display: flex; 
+            flex-direction: column; justify-content: center; align-items: center;
+            border: 1px solid #eee; transition: 1s cubic-bezier(0.7, 0, 0.3, 1);
         }
-        .left-door { border-right: 2px solid var(--blue-mobili); }
-        .right-door { border-left: 2px solid var(--blue-mobili); }
-        
-        .door-logo { width: 150px; margin-bottom: 30px; }
-        .door-handle { width: 6px; height: 280px; background: #ccc; border-radius: 3px; }
+        .left-door { border-right: 2px solid var(--blue); }
+        .right-door { border-left: 2px solid var(--blue); }
+        .door img { width: 140px; margin-bottom: 20px; }
+        .handle { width: 6px; height: 200px; background: #ccc; border-radius: 3px; }
 
-        /* UI SOBRE EL 3D */
+        /* INTERFAZ LIMPIA */
         #ui-layer {
             position: fixed; inset: 0; z-index: 100; pointer-events: none;
-            display: flex; flex-direction: column; justify-content: space-between;
-            padding: 20px; opacity: 0; transition: 1s;
+            display: flex; flex-direction: column; opacity: 0; transition: 1s;
         }
-        .ui-header { text-align: center; margin-bottom: 20px; }
-        .ui-header h1 { font-size: 1.5rem; color: var(--brand-dark); }
-        .ui-header p { font-size: 0.9rem; color: #555; margin-top: 5px; }
+        
+        .header { padding: 15px; text-align: center; background: rgba(255,255,255,0.9); }
+        .header h1 { font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* ETIQUETAS DE MEDIDA */
-        .measure-tag {
-            position: absolute; font-family: 'Roboto Mono', monospace; font-size: 0.7rem;
-            color: var(--blue-mobili); background: rgba(255,255,255,0.8);
-            padding: 5px 10px; border: 1px solid var(--blue-mobili); border-radius: 3px;
-            pointer-events: none; white-space: nowrap;
+        /* MEDIDAS - FIJAS A LOS COSTADOS PARA NO TAPAR */
+        .info-panel {
+            flex-grow: 1; position: relative;
+        }
+        .tag {
+            position: absolute; background: white; border: 1px solid var(--blue);
+            color: var(--blue); font-family: 'Roboto Mono'; font-size: 10px;
+            padding: 4px 8px; border-radius: 3px; box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
         }
 
-        .controls-panel { 
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
-            pointer-events: all; padding-bottom: 20px;
+        /* BARRA INFERIOR DE BOTONES */
+        .footer-controls {
+            padding: 15px; background: #fff; border-top: 1px solid #eee;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            pointer-events: all;
         }
-        .btn-control { 
-            padding: 12px 20px; border: 1px solid var(--blue-mobili); background: #fff;
-            font-size: 0.7rem; font-weight: bold; text-transform: uppercase; cursor: pointer;
-            transition: 0.3s; color: var(--brand-dark); border-radius: 5px;
+        .btn {
+            padding: 10px; border: 1px solid var(--blue); background: #fff;
+            font-size: 9px; font-weight: bold; cursor: pointer; text-transform: uppercase;
         }
-        .btn-control:hover, .btn-control.active { background: var(--blue-mobili); color: #fff; }
-
-        #link-mobili {
-            display: block; text-align: center; margin-top: 15px;
-            font-size: 0.7rem; color: var(--blue-mobili); text-decoration: none;
-            font-family: 'Roboto Mono', monospace; pointer-events: all;
-        }
+        .btn.active { background: var(--blue); color: #fff; }
+        .btn-main { grid-column: span 3; background: var(--dark); color: #fff; border: none; text-decoration: none; text-align: center; }
 
         canvas { display: block; }
     </style>
 </head>
 <body>
 
-    <div id="splash" onclick="initShowroom()">
+    <div id="splash" onclick="openDoors()">
         <div class="door left-door">
-            <img class="door-logo" src="https://mobili.ar/wp-content/uploads/2022/11/logo-mobili.png" alt="Mobili">
-            <div class="door-handle"></div>
+            <img src="https://mobili.ar/wp-content/uploads/2022/11/logo-mobili.png">
+            <div class="handle"></div>
         </div>
         <div class="door right-door">
-            <img class="door-logo" src="https://mobili.ar/wp-content/uploads/2022/11/logo-mobili.png" alt="Mobili" style="visibility: hidden;">
-            <div class="door-handle"></div>
+            <img src="https://mobili.ar/wp-content/uploads/2022/11/logo-mobili.png" style="visibility:hidden">
+            <div class="handle"></div>
         </div>
-        <div style="position: absolute; bottom: 10%; color: var(--brand-dark); font-weight: 600; letter-spacing: 2px; font-size: 0.8rem; pointer-events: none;">[ EXPLORAR MODELO 3D ]</div>
     </div>
 
     <div id="ui-layer">
-        <div class="ui-header">
+        <div class="header">
             <h1>Mobili showroom</h1>
-            <p>Visualizador Interactivo 3D</p>
         </div>
 
-        <div class="measure-tag" style="top: 30%; left: 60%;">ALACENA: 2.40m x 0.70m</div>
-        <div class="measure-tag" style="top: 30%; right: 20%;">ALACENA: 2.40m x 0.70m</div>
-        <div class="measure-tag" style="top: 55%; left: 35%;">BAJO MESADA: 2.40m x 0.90m</div>
-        <div class="measure-tag" style="top: 50%; right: 15%;">PROFUNDIDAD: 0.60m</div>
-
-        <div class="controls-panel">
-            <button class="btn-control active" onclick="changeMuebleColor(0xffffff, this)">Blanco</button>
-            <button class="btn-control" onclick="changeMuebleColor(0x2c2c2c, this)">Grafito</button>
-            <button class="btn-control" onclick="changeMuebleColor(0xdfc4a3, this)">Roble</button>
-            <a href="https://mobili.ar/" target="_blank" class="btn-control" style="background: var(--blue-mobili); color: white; border-color: var(--blue-mobili);">Ir a mobili.ar</a>
+        <div class="info-panel">
+            <div class="tag" style="top: 10%; right: 5%;">ALACENA: 2.40m</div>
+            <div class="tag" style="top: 45%; left: 5%;">BAJO MESADA: 0.90m</div>
+            <div class="tag" style="bottom: 10%; right: 5%;">PROF: 0.60m</div>
         </div>
-        <a id="link-mobili" href="https://mobili.ar/" target="_blank">https://mobili.ar/</a>
+
+        <div class="footer-controls">
+            <button class="btn active" onclick="setCol(0xffffff, this)">Blanco</button>
+            <button class="btn" onclick="setCol(0x333333, this)">Grafito</button>
+            <button class="btn" onclick="setCol(0xdfc4a3, this)">Roble</button>
+            <a href="https://mobili.ar" class="btn btn-main">IR A MOBILI.AR</a>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        let scene, camera, renderer, kitchenModule, materialMueble;
+        let scene, camera, renderer, mueble, mat;
 
-        function setupThreeJS() {
+        function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xf8f8f8); // Fondo claro para el showroom
+            scene.background = new THREE.Color(0xfdfdfd);
             
             camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            document.body.appendChild(renderer.domElement); // Añade el canvas al body
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.body.appendChild(renderer.domElement);
 
-            // GRID TÉCNICO (más sutil, como en la imagen)
-            const grid = new THREE.GridHelper(10, 20, 0x999999, 0xcccccc);
-            grid.position.y = -1.2; // Posicionamiento para que el mueble quede sobre el suelo
+            const grid = new THREE.GridHelper(20, 30, 0xcccccc, 0xeeeeee);
+            grid.position.y = -1.5;
             scene.add(grid);
 
-            // EL MUEBLE COMPLETO
-            kitchenModule = new THREE.Group();
-            materialMueble = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, metalness: 0.1 });
-            const steelMaterial = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.9, roughness: 0.2 });
+            mueble = new THREE.Group();
+            mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+            const sMat = new THREE.MeshStandardMaterial({ color: 0x888, metalness: 0.9 });
 
-            // Bajo Mesada
-            const bajo = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.9, 0.6), materialMueble);
-            bajo.position.y = -0.3; // Elevado ligeramente sobre el grid
-            
-            // Alacena Superior
-            const alacena = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.7, 0.35), materialMueble);
-            alacena.position.y = 1.3;
+            const bajo = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.9, 0.6), mat);
+            bajo.position.y = -0.5;
+            const hB = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.04, 0.04), sMat);
+            hB.position.set(0, 0.4, 0.31); bajo.add(hB);
 
-            // MANIJAS DE PERFIL J (LONGITUDINALES)
-            const handleGeometry = new THREE.BoxGeometry(2.3, 0.04, 0.04); // Más finas y largas
-            
-            const handleBajo = new THREE.Mesh(handleGeometry, steelMaterial);
-            handleBajo.position.set(0, 0.4, 0.31); // Centro del bajo mesada, al frente
-            bajo.add(handleBajo);
+            const ala = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.7, 0.35), mat);
+            ala.position.y = 1.1;
+            const hA = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.04, 0.04), sMat);
+            hA.position.set(0, -0.3, 0.18); ala.add(hA);
 
-            const handleAlacena = new THREE.Mesh(handleGeometry, steelMaterial);
-            handleAlacena.position.set(0, -0.3, 0.18); // Centro de la alacena, al frente
-            alacena.add(handleAlacena);
+            mueble.add(bajo, ala);
+            scene.add(mueble);
 
-            kitchenModule.add(bajo, alacena);
-            scene.add(kitchenModule);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const d = new THREE.DirectionalLight(0xffffff, 0.5); d.position.set(5,10,7); scene.add(d);
 
-            // ILUMINACIÓN (Suave y uniforme)
-            const ambient = new THREE.AmbientLight(0xffffff, 0.8);
-            const directional = new THREE.DirectionalLight(0xffffff, 0.7);
-            directional.position.set(5, 5, 5);
-            scene.add(ambient, directional);
-
-            // POSICIÓN DE CÁMARA INICIAL (Más cercana y centrada)
-            camera.position.set(3, 1.5, 5);
-            camera.lookAt(0, 0.5, 0); // Mirando al centro del mueble
-
+            // CÁMARA AJUSTADA PARA MÓVIL (Más lejos para que entre todo el mueble)
+            camera.position.set(0, 0.8, 6); 
             animate();
         }
 
-        function initShowroom() {
-            document.querySelector('.left-door').style.transform = 'translateX(-100vw)'; // Se va completamente
-            document.querySelector('.right-door').style.transform = 'translateX(100vw)'; // Se va completamente
-            document.getElementById('splash').style.opacity = '0';
+        function openDoors() {
+            document.querySelector('.left-door').style.transform = 'translateX(-100%)';
+            document.querySelector('.right-door').style.transform = 'translateX(100%)';
             setTimeout(() => {
                 document.getElementById('splash').style.display = 'none';
                 document.getElementById('ui-layer').style.opacity = '1';
-            }, 1000); // Coincide con la transición de las puertas
+            }, 1000);
         }
 
-        function changeMuebleColor(hexColor, button) {
-            materialMueble.color.setHex(hexColor);
-            document.querySelectorAll('.btn-control').forEach(btn => btn.classList.remove('active'));
-            if (button) button.classList.add('active'); // Marca el botón activo
+        function setCol(c, b) {
+            mat.color.setHex(c);
+            document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+            b.classList.add('active');
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            if (kitchenModule) {
-                kitchenModule.rotation.y += 0.002; // Rotación suave para visualizar 3D
-            }
+            if(mueble) mueble.rotation.y += 0.005;
             renderer.render(scene, camera);
         }
 
-        // RESPONSIVE EN ACCIÓN
-        window.addEventListener('resize', () => {
+        window.onresize = () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        };
 
-        setupThreeJS();
+        init();
     </script>
 </body>
-</html>
+    </html>

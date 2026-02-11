@@ -3,85 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MOBILI — Módulo de Visualización 3D</title>
+    <title>MOBILI — INTERACTIVE SHOWROOM</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
-        :root { --cyan: #00d4ff; --bg: #000a1a; --grid: rgba(0, 212, 255, 0.15); }
+        :root { --cyan: #00d4ff; --bg: #000a1a; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--bg); color: white; font-family: 'Montserrat', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* PANTALLA DE ENTRADA (PUERTAS BLANCAS) */
+        /* BIENVENIDA: PUERTAS DE FÁBRICA */
         #splash {
             position: fixed; inset: 0; background: #fff; z-index: 2000;
             display: flex; justify-content: center; align-items: center;
-            transition: 1.5s cubic-bezier(0.7, 0, 0.3, 1); overflow: hidden;
+            transition: 1.5s cubic-bezier(0.7, 0, 0.3, 1);
         }
         .door {
             position: absolute; width: 50%; height: 100%; background: #fdfdfd;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            border: 1px solid #eee; transition: 1.5s ease-in-out;
+            border: 1px solid #ddd; transition: 1.5s ease-in-out;
         }
         .left-door { left: 0; border-right: 2px solid var(--cyan); }
         .right-door { right: 0; border-left: 2px solid var(--cyan); }
+        .handle { width: 12px; height: 300px; background: linear-gradient(90deg, #999, #eee, #999); border-radius: 10px; box-shadow: 0 0 20px rgba(0,212,255,0.5); }
         
-        .handle { width: 10px; height: 200px; background: linear-gradient(to bottom, #999, #eee, #999); border-radius: 5px; box-shadow: 0 0 15px var(--cyan); }
-        .door-logo { width: 120px; margin: 20px; filter: grayscale(1); opacity: 0.8; }
-        .instruction { position: absolute; bottom: 10%; color: #888; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; z-index: 2001; }
+        .instruction { position: absolute; bottom: 15%; color: #555; font-size: 0.7rem; letter-spacing: 3px; cursor: pointer; z-index: 2001; font-weight: bold; }
 
         /* INTERFAZ OVERLAY */
         .ui-system { position: fixed; inset: 0; z-index: 100; pointer-events: none; opacity: 0; transition: 2s; }
-        .header { position: absolute; top: 0; width: 100%; padding: 30px; display: flex; justify-content: space-between; align-items: flex-start; }
-        .tech-box { border-left: 2px solid var(--cyan); padding-left: 15px; }
-        .tech-box h2 { font-size: 0.8rem; letter-spacing: 3px; color: var(--cyan); }
-        
-        .mat-selector { pointer-events: all; display: flex; gap: 10px; margin-top: 15px; }
-        .btn-mat { background: rgba(0,212,255,0.05); border: 1px solid var(--cyan); color: white; padding: 10px 15px; font-size: 0.6rem; font-family: 'JetBrains Mono'; cursor: pointer; }
-        .btn-mat.active { background: var(--cyan); color: black; }
+        .header-tech { position: absolute; top: 20px; left: 20px; border-left: 3px solid var(--cyan); padding-left: 15px; }
+        .header-tech h1 { font-size: 1.2rem; letter-spacing: 5px; }
+        .header-tech p { font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--cyan); }
 
-        /* MEDIDAS PROYECTADAS */
-        .measure { position: absolute; font-family: 'JetBrains Mono'; color: var(--cyan); font-size: 0.65rem; border: 1px solid var(--cyan); padding: 4px 8px; background: rgba(0,0,0,0.8); pointer-events: none; }
+        /* ETIQUETAS DE MEDIDA */
+        .measure-tag {
+            position: absolute; font-family: 'JetBrains Mono'; color: var(--cyan);
+            font-size: 0.65rem; padding: 5px 10px; background: rgba(0,0,0,0.8);
+            border: 1px solid var(--cyan); pointer-events: none;
+        }
 
-        .footer { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; gap: 20px; pointer-events: all; }
-        .btn-main { padding: 15px 40px; border: 1px solid var(--cyan); color: white; text-decoration: none; font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; transition: 0.3s; }
-        .btn-main:hover { background: var(--cyan); color: black; box-shadow: 0 0 30px var(--cyan); }
+        .footer-nav { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; gap: 20px; pointer-events: all; }
+        .btn-smart { padding: 12px 30px; border: 1px solid var(--cyan); color: white; text-decoration: none; font-size: 0.7rem; font-weight: bold; letter-spacing: 2px; transition: 0.3s; background: rgba(0,212,255,0.1); }
+        .btn-smart:hover { background: var(--cyan); color: #000; box-shadow: 0 0 30px var(--cyan); }
 
         #canvas-wrap { position: absolute; inset: 0; z-index: 1; }
     </style>
 </head>
 <body>
 
-    <div id="splash" onclick="openDoors()">
-        <div class="door left-door">
-            <div class="handle"></div>
-            <h1 style="color:#222; margin-top:20px; letter-spacing:5px;">MOBILI</h1>
-        </div>
-        <div class="door right-door">
-            <div class="handle"></div>
-            <h1 style="color:#222; margin-top:20px; letter-spacing:5px;">MOBILI</h1>
-        </div>
-        <div class="instruction">PRESIONAR PARA INICIAR EXPERIENCIA</div>
+    <div id="splash" onclick="openShowroom()">
+        <div class="door left-door"><div class="handle"></div></div>
+        <div class="door right-door"><div class="handle"></div></div>
+        <div class="instruction">CLICK PARA ABRIR SHOWROOM MOBILI</div>
     </div>
 
     <div class="ui-system" id="ui">
-        <div class="header">
-            <div class="tech-box">
-                <h2>CONFIGURADOR V.2.0</h2>
-                <div class="mat-selector">
-                    <button class="btn-mat active" onclick="setMat(0xfaf8f5, this)">Blanco Nórdico</button>
-                    <button class="btn-mat" onclick="setMat(0x1a1a1a, this)">Negro Brillante</button>
-                    <button class="btn-mat" onclick="setMat(0xb58e58, this)">Roble Natural</button>
-                </div>
-            </div>
+        <div class="header-tech">
+            <h1>MOBILI</h1>
+            <p>MÓDULO DE INGENIERÍA 3D // SMART TECH</p>
         </div>
 
-        <div class="measure" style="top: 30%; left: 70%;">ALTURA: 2.20 m</div>
-        <div class="measure" style="top: 55%; left: 75%;">FRENTE: 2.50 m</div>
-        <div class="measure" style="top: 50%; left: 20%;">PROF: 0.60 m</div>
+        <div class="measure-tag" style="top: 25%; right: 20%;">ALACENA: 2.50m x 0.70m</div>
+        <div class="measure-tag" style="top: 60%; right: 15%;">BAJO MESADA: 2.50m x 0.90m</div>
+        <div class="measure-tag" style="bottom: 20%; left: 20%;">PROFUNDIDAD: 0.60m</div>
 
-        <div class="footer">
-            <a href="#" class="btn-main">COTIZAR</a>
-            <a href="#" class="btn-main" style="background:white; color:black; border:none;">SHOWROOM</a>
-            <a href="#" class="btn-main">AR MODE</a>
+        <div class="footer-nav">
+            <a href="#" class="btn-smart" onclick="updateMat(0xfaf8f5)">BLANCO</a>
+            <a href="#" class="btn-smart" onclick="updateMat(0x1a1a1a)">NEGRO</a>
+            <a href="#" class="btn-smart" onclick="updateMat(0xb58e58)">ROBLE</a>
+            <a href="#" class="btn-smart" style="background:white; color:black;">COTIZAR</a>
         </div>
     </div>
 
@@ -89,7 +77,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        let scene, camera, renderer, kitchen;
+        let scene, camera, renderer, group, matMueble;
 
         function init() {
             scene = new THREE.Scene();
@@ -99,51 +87,51 @@
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('mainCanvas'), antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            // EL SUELO DE REJILLA (GRID) - La esencia técnica
+            // 1. RECUERDA EL GRID AZUL (El piso técnico)
             const grid = new THREE.GridHelper(20, 40, 0x00d4ff, 0x002244);
             grid.position.y = -1;
             scene.add(grid);
 
-            // MUEBLE (ALACENA + BAJO MESADA)
-            kitchen = new THREE.Group();
-            const woodMat = new THREE.MeshStandardMaterial({ color: 0xfaf8f5, roughness: 0.2 });
+            // 2. EL MUEBLE COMPLETO
+            group = new THREE.Group();
+            matMueble = new THREE.MeshStandardMaterial({ color: 0xfaf8f5, roughness: 0.3, metalness: 0.1 });
 
-            const base = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.9, 0.6), woodMat);
-            const alacena = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.7, 0.35), woodMat);
-            alacena.position.y = 1.6;
+            // Bajo Mesada
+            const bajo = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.9, 0.6), matMueble);
+            bajo.position.y = -0.1;
+            
+            // Alacena
+            const alacena = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.7, 0.35), matMueble);
+            alacena.position.y = 1.3;
 
-            kitchen.add(base, alacena);
-            scene.add(kitchen);
+            group.add(bajo, alacena);
+            scene.add(group);
 
-            // ILUMINACIÓN ESTILO SHOWROOM
-            const light1 = new THREE.DirectionalLight(0xffffff, 1);
-            light1.position.set(5, 5, 5);
-            scene.add(light1, new THREE.AmbientLight(0x404040, 2));
+            // 3. ILUMINACIÓN NEÓN
+            const light = new THREE.PointLight(0x00d4ff, 1.5, 20);
+            light.position.set(2, 3, 4);
+            scene.add(light, new THREE.AmbientLight(0xffffff, 0.5));
 
-            camera.position.set(3, 2, 6);
-            camera.lookAt(0, 0.8, 0);
+            camera.position.set(4, 2, 6);
+            camera.lookAt(0, 0.5, 0);
             animate();
         }
 
-        function openDoors() {
+        function openShowroom() {
             document.querySelector('.left-door').style.transform = 'translateX(-100%)';
             document.querySelector('.right-door').style.transform = 'translateX(100%)';
-            document.querySelector('.instruction').style.display = 'none';
+            document.getElementById('splash').style.opacity = '0';
             setTimeout(() => {
+                document.getElementById('splash').style.display = 'none';
                 document.getElementById('ui').style.opacity = '1';
-                document.getElementById('splash').style.pointerEvents = 'none';
             }, 1000);
         }
 
-        function setMat(color, btn) {
-            kitchen.children.forEach(mesh => mesh.material.color.setHex(color));
-            document.querySelectorAll('.btn-mat').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+        function updateMat(col) { matMueble.color.setHex(col); }
 
         function animate() {
             requestAnimationFrame(animate);
-            kitchen.rotation.y += 0.003; // Movimiento orbital suave
+            if(group) group.rotation.y += 0.003; 
             renderer.render(scene, camera);
         }
 
@@ -155,4 +143,4 @@
         };
     </script>
 </body>
-    </html>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mobili.ar — Experiencia 3D</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cyan: #00d4ff;
+      --bg: #000a1a;
+      --glass: rgba(0, 20, 40, 0.85);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: var(--bg);
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* HEADER: Selector de Materiales */
+    .interface-header {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      padding: 15px;
+      background: linear-gradient(to bottom, var(--glass), transparent);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    }
+
+    .title {
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      color: var(--cyan);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .mat-grid {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-mat {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--cyan);
+      color: white;
+      padding: 8px 15px;
+      font-size: 0.6rem;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.3s;
+    }
+
+    .btn-mat.active {
+      background: var(--cyan);
+      color: black;
+      box-shadow: 0 0 15px var(--cyan);
+    }
+
+    /* ESCENA 3D */
+    #canvas-container {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    /* FOOTER: Botones de Acción */
+    .interface-footer {
+      position: fixed;
+      bottom: 0; left: 0; width: 100%;
+      padding: 20px;
+      background: linear-gradient(to top, black, transparent);
+      z-index: 100;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .btn-cta {
+      flex: 1;
+      max-width: 180px;
+      padding: 14px;
+      text-align: center;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: 1px;
+      transition: 0.3s;
+    }
+
+    .btn-quote {
+      border: 1px solid var(--cyan);
+      color: white;
+      background: rgba(0, 31, 63, 0.6);
+    }
+
+    .btn-ar {
+      background: white;
+      color: #000;
+    }
+
+    /* Medidas */
+    .measure-tag {
+      position: absolute;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid var(--cyan);
+      padding: 2px 6px;
+      font-size: 0.55rem;
+      font-family: 'JetBrains Mono', monospace;
+      pointer-events: none;
+      z-index: 50;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="interface-header">
+    <div class="title">SISTEMA DE CONFIGURACIÓN 3D</div>
+    <div class="mat-grid">
+      <button class="btn-mat active" onclick="updateMat(0xfaf8f5, this)">Blanco</button>
+      <button class="btn-mat" onclick="updateMat(0x1a1a1a, this)">Negro</button>
+      <button class="btn-mat" onclick="updateMat(0xb58e58, this)">Roble</button>
+      <button class="btn-mat" onclick="updateMat(0x4e342e, this)">Nogal</button>
+    </div>
+  </header>
+
+  <div id="canvas-container">
+    <canvas id="mainCanvas"></canvas>
+  </div>
+
+  <footer class="interface-footer">
+    <a href="#" class="btn-cta btn-quote">SOLICITAR COTIZACIÓN</a>
+    <a href="#" class="btn-cta btn-ar">VISTA AR</a>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    const canvas = document.getElementById('mainCanvas');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000a1a);
+
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    // Mueble Modular
+    const group = new THREE.Group();
+    const material = new THREE.MeshStandardMaterial({ color: 0xfaf8f5, roughness: 0.3 });
+    
+    // Cuerpo Base
+    const base = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.9, 0.6), material);
+    base.position.y = 0.45;
+    group.add(base);
+
+    // Alacena
+    const topCabinet = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.7, 0.35), material);
+    topCabinet.position.y = 1.6;
+    group.add(topCabinet);
+
+    scene.add(group);
+
+    // Luces
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambient);
+    const directional = new THREE.DirectionalLight(0xffffff, 1);
+    directional.position.set(5, 5, 5);
+    scene.add(directional);
+
+    camera.position.set(0, 1.2, 4);
+
+    function updateMat(color, btn) {
+      material.color.setHex(color);
+      document.querySelectorAll('.btn-mat').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      group.rotation.y += 0.005;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.onresize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+  </script>
+</body>
+</html>

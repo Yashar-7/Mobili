@@ -3,134 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mobili.ar — Visualizador Profesional</title>
+    <title>MOBILI INTERACTIVE — Smart Tech</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root { --cyan: #00d4ff; --bg: #000a1a; --steel: #e0e0e0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--bg); color: white; font-family: 'Montserrat', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* HEADER TECNOLÓGICO */
+        /* PANTALLA DE ENTRADA (Mobili Interactive) */
+        #splash {
+            position: fixed; inset: 0; background: black; z-index: 2000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: 1.2s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+        .logo-box {
+            border: 4px solid var(--cyan); padding: 20px 40px;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+            text-align: center; cursor: pointer; transition: 0.3s;
+        }
+        .logo-box:hover { transform: scale(1.05); box-shadow: 0 0 50px var(--cyan); }
+        .logo-box h1 { letter-spacing: 12px; font-size: 2rem; margin-bottom: 5px; }
+        .logo-box p { font-size: 0.7rem; letter-spacing: 4px; color: var(--cyan); }
+        .instruction { margin-top: 30px; font-family: 'JetBrains Mono'; font-size: 0.6rem; opacity: 0.6; animation: blink 1.5s infinite; }
+
+        /* INTERFAZ DEL CONFIGURADOR (Oculta al inicio) */
+        .ui-overlay { opacity: 0; transition: 2s; pointer-events: none; }
         .interface-header {
-            position: fixed;
-            top: 0; width: 100%; padding: 20px;
-            background: rgba(0, 15, 31, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--cyan);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            position: fixed; top: 0; width: 100%; padding: 20px;
+            background: linear-gradient(to bottom, rgba(0,20,40,0.9), transparent);
+            z-index: 100; text-align: center; border-bottom: 1px solid rgba(0,212,255,0.2);
         }
-
-        .logo-txt { font-weight: 700; letter-spacing: 5px; color: var(--cyan); font-size: 0.8rem; margin-bottom: 10px; }
-        .mat-selector { display: flex; gap: 10px; }
-        
-        .btn-mat {
+        .mat-btn {
             background: transparent; border: 1px solid var(--cyan); color: white;
-            padding: 8px 15px; font-size: 0.6rem; border-radius: 4px; cursor: pointer;
-            transition: 0.3s; text-transform: uppercase;
+            padding: 8px 15px; font-size: 0.6rem; border-radius: 3px; cursor: pointer; margin: 0 5px;
         }
-        .btn-mat:hover, .btn-mat.active { background: var(--cyan); color: black; box-shadow: 0 0 15px var(--cyan); }
-
-        /* ESCENA */
-        #canvas-wrap { position: absolute; inset: 0; z-index: 1; }
-
-        /* FOOTER DE ACCIONES */
         .interface-footer {
-            position: fixed;
-            bottom: 0; width: 100%; padding: 25px;
-            display: flex; justify-content: center; gap: 15px;
-            background: linear-gradient(to top, black, transparent);
-            z-index: 100;
+            position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 15px; z-index: 100;
+        }
+        .btn-cta {
+            padding: 12px 25px; border: 1px solid var(--cyan); color: white; text-decoration: none; font-size: 0.7rem; font-weight: 700; border-radius: 5px;
         }
 
-        .btn-action {
-            flex: 1; max-width: 160px; padding: 15px;
-            text-align: center; border-radius: 5px; font-weight: 700;
-            font-size: 0.7rem; text-decoration: none; transition: 0.3s;
-            border: 1px solid var(--cyan); color: white;
-        }
-        .btn-ar { background: white; color: black; border: none; }
+        @keyframes blink { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+        .active-ui { opacity: 1 !important; pointer-events: all !important; }
+        #canvas-wrap { position: absolute; inset: 0; z-index: 1; }
     </style>
 </head>
 <body>
 
-    <header class="interface-header">
-        <div class="logo-txt">MOBILI • SMART TECH</div>
-        <div class="mat-selector">
-            <button class="btn-mat active" onclick="changeColor(0xfaf8f5, this)">Blanco</button>
-            <button class="btn-mat" onclick="changeColor(0x1a1a1a, this)">Negro</button>
-            <button class="btn-mat" onclick="changeColor(0xb58e58, this)">Roble</button>
+    <div id="splash" onclick="startExperience()">
+        <div class="logo-box">
+            <h1>MOBILI</h1>
+            <p>INTERACTIVE</p>
         </div>
-    </header>
+        <div class="instruction">PRESIONAR PARA INICIAR EXPERIENCIA</div>
+    </div>
+
+    <div class="ui-overlay" id="main-ui">
+        <header class="interface-header">
+            <div class="mat-selector">
+                <button class="mat-btn" onclick="updateColor(0xfaf8f5)">BLANCO</button>
+                <button class="mat-btn" onclick="updateColor(0x1a1a1a)">NEGRO</button>
+                <button class="mat-btn" onclick="updateColor(0xb58e58)">ROBLE</button>
+            </div>
+        </header>
+
+        <footer class="interface-footer">
+            <a href="#" class="btn-cta">COTIZAR</a>
+            <a href="#" class="btn-cta" style="background:white; color:black;">VISTA AR</a>
+        </footer>
+    </div>
 
     <div id="canvas-wrap"><canvas id="mainCanvas"></canvas></div>
 
-    <footer class="interface-footer">
-        <a href="https://tu-pagina.com/cotizar" class="btn-action">COTIZAR AHORA</a>
-        <a href="#" class="btn-action btn-ar">VISTA AR</a>
-    </footer>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        const canvas = document.getElementById('mainCanvas');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x000a1a);
+        let scene, camera, renderer, leftDoor, rightDoor, mainMat;
+        let isStarted = false;
 
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000a1a);
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('mainCanvas'), antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
 
-        // GRUPO MUEBLE
-        const cabinet = new THREE.Group();
-        const mainMat = new THREE.MeshStandardMaterial({ color: 0xfaf8f5, roughness: 0.4 });
-        const steelMat = new THREE.MeshStandardMaterial({ color: 0x999999, metalness: 0.8, roughness: 0.2 });
+            mainMat = new THREE.MeshStandardMaterial({ color: 0xfaf8f5, roughness: 0.3 });
+            const steelMat = new THREE.MeshStandardMaterial({ color: 0xe0e0e0, metalness: 0.9, roughness: 0.1 });
 
-        // Cuerpo principal
-        const body = new THREE.Mesh(new THREE.BoxGeometry(2, 2.2, 0.6), mainMat);
-        body.position.y = 1.1;
-        cabinet.add(body);
+            const kitchenGroup = new THREE.Group();
 
-        // Puertas con Manijas
-        function createDoor(xPos) {
-            const door = new THREE.Mesh(new THREE.BoxGeometry(0.95, 2.1, 0.05), mainMat);
-            door.position.set(xPos, 1.1, 0.32);
-            
-            // Manija de acero
-            const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.4), steelMat);
-            handle.rotation.z = 0;
-            handle.position.set(xPos > 0 ? -0.35 : 0.35, 0, 0.05);
-            door.add(handle);
-            
-            return door;
+            // BAJO MESADA
+            const base = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.9, 0.6), mainMat);
+            base.position.y = 0.45;
+            kitchenGroup.add(base);
+
+            // ALACENA SUPERIOR
+            const topCab = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.7, 0.35), mainMat);
+            topCab.position.y = 1.7;
+            kitchenGroup.add(topCab);
+
+            // PUERTAS QUE SE ABREN (Splash/Mueble)
+            leftDoor = new THREE.Group();
+            const d1 = new THREE.Mesh(new THREE.BoxGeometry(1.1, 2.3, 0.05), mainMat);
+            const h1 = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.6), steelMat);
+            h1.position.set(0.4, 0, 0.05); d1.add(h1);
+            leftDoor.add(d1);
+            leftDoor.position.set(-0.55, 1.15, 0.65);
+
+            rightDoor = new THREE.Group();
+            const d2 = new THREE.Mesh(new THREE.BoxGeometry(1.1, 2.3, 0.05), mainMat);
+            const h2 = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.6), steelMat);
+            h2.position.set(-0.4, 0, 0.05); d2.add(h2);
+            rightDoor.add(d2);
+            rightDoor.position.set(0.55, 1.15, 0.65);
+
+            scene.add(leftDoor, rightDoor, kitchenGroup);
+
+            // LUCES
+            const light = new THREE.PointLight(0x00d4ff, 1.5, 10);
+            light.position.set(2, 3, 4);
+            scene.add(light, new THREE.AmbientLight(0xffffff, 0.6));
+
+            camera.position.set(0, 1.2, 5);
+            animate();
         }
 
-        const leftDoor = createDoor(-0.5);
-        const rightDoor = createDoor(0.5);
-        cabinet.add(leftDoor, rightDoor);
-        scene.add(cabinet);
-
-        // ILUMINACIÓN
-        const light1 = new THREE.PointLight(0x00d4ff, 1, 10);
-        light1.position.set(2, 3, 2);
-        scene.add(light1, new THREE.AmbientLight(0xffffff, 0.7));
-
-        camera.position.set(0, 1.5, 4.5);
-
-        function changeColor(c, btn) {
-            mainMat.color.setHex(c);
-            document.querySelectorAll('.btn-mat').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        function startExperience() {
+            isStarted = true;
+            document.getElementById('splash').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('splash').style.display = 'none';
+                document.getElementById('main-ui').classList.add('active-ui');
+            }, 1200);
         }
+
+        function updateColor(c) { mainMat.color.setHex(c); }
 
         function animate() {
             requestAnimationFrame(animate);
-            cabinet.rotation.y += 0.005; // Rotación automática
+            if (isStarted) {
+                // Animación de apertura de puertas
+                if (leftDoor.position.x > -1.8) {
+                    leftDoor.position.x -= 0.03;
+                    rightDoor.position.x += 0.03;
+                    leftDoor.rotation.y -= 0.01;
+                    rightDoor.rotation.y += 0.01;
+                }
+            }
             renderer.render(scene, camera);
         }
-        animate();
 
+        init();
         window.onresize = () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();

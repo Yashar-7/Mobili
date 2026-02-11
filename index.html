@@ -3,32 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MOBILI | High Definition</title>
+    <title>MOBILI | Showroom Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
-        :root { --blue-mobili: #004a99; --dark: #0a1f33; --bg-scene: #ececec; }
+        :root { --blue-mobili: #004a99; --dark: #0a1f33; --bg-scene: #f0f0f0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--bg-scene); font-family: 'Montserrat', sans-serif; overflow: hidden; height: 100vh; }
 
+        /* LOGO */
         .logo-container { display: flex; align-items: center; gap: 10px; }
         .logo-square { width: 35px; height: 35px; background: var(--blue-mobili); display: flex; justify-content: center; align-items: center; border-radius: 2px; }
         .logo-inner { width: 15px; height: 15px; background: white; border-radius: 1px; }
         .logo-text { color: var(--blue-mobili); font-weight: 700; font-size: 24px; letter-spacing: 2px; text-transform: uppercase; }
 
+        /* PUERTAS DE ENTRADA CORREGIDAS */
         #splash { position: fixed; inset: 0; z-index: 2000; display: flex; cursor: pointer; }
         .door { flex: 1; height: 100%; background: #ffffff; display: flex; justify-content: center; align-items: center; border: 1px solid #ddd; transition: 1.2s cubic-bezier(0.7, 0, 0.3, 1); position: relative; }
         .left-door { border-right: 2px solid var(--blue-mobili); }
         .right-door { border-left: 2px solid var(--blue-mobili); }
-        
-        /* MANILLAS CORREGIDAS AL CENTRO */
         .handle { width: 8px; height: 250px; background: linear-gradient(to right, #ccc, #eee, #bbb); border-radius: 4px; position: absolute; }
-        .left-door .handle { right: 15px; }
-        .right-door .handle { left: 15px; }
+        .left-door .handle { right: 15px; } /* MANIJA AL CENTRO */
+        .right-door .handle { left: 15px; } /* MANIJA AL CENTRO */
 
+        /* INTERFAZ */
         #ui-layer { position: fixed; inset: 0; z-index: 100; pointer-events: none; display: flex; flex-direction: column; opacity: 0; transition: 1s; }
         .header { padding: 20px; text-align: center; }
-        .header h1 { font-size: 1rem; color: var(--dark); letter-spacing: 4px; }
-
         .tag { position: absolute; background: white; border: 1.5px solid var(--blue-mobili); color: var(--blue-mobili); font-family: 'Roboto Mono'; font-size: 11px; font-weight: bold; padding: 5px 10px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
         .footer { padding: 10px; background: white; display: flex; overflow-x: auto; gap: 8px; pointer-events: all; border-top: 1px solid #ddd; }
@@ -47,7 +46,6 @@
             <div class="handle"></div>
         </div>
         <div class="door right-door">
-            <div class="logo-container"><div class="logo-square"><div class="logo-inner"></div></div><div class="logo-text">MOBILI</div></div>
             <div class="handle"></div>
         </div>
     </div>
@@ -55,7 +53,6 @@
     <div id="ui-layer">
         <div class="header">
             <div class="logo-container" style="justify-content: center; transform: scale(0.8);"><div class="logo-square"><div class="logo-inner"></div></div><div class="logo-text">MOBILI</div></div>
-            <p style="font-size: 9px; margin-top: 5px; letter-spacing: 2px;">SHOWROOM INTERACTIVO</p>
         </div>
         <div style="flex-grow: 1; position: relative;">
             <div class="tag" style="top: 15%; right: 8%;">ALACENA: 2.40m</div>
@@ -68,9 +65,8 @@
                 <button class="btn" onclick="updateColor(0xBDB7AB, false, this)">Gris Arcilla</button>
                 <button class="btn" onclick="updateColor(0x1A1A1A, false, this)">Negro Brillante</button>
                 <button class="btn" onclick="updateColor(0x78726F, false, this)">Gris Tapir</button>
-                <button class="btn" onclick="updateColor(0xD2A679, true, this)">Kendal Encerado</button>
+                <button class="btn" onclick="updateColor(0xc4a484, true, this)">Halifax Natural</button>
                 <button class="btn" onclick="updateColor(0xE0E0E0, false, this)">Ceniza</button>
-                <button class="btn" onclick="updateColor(0x6B6D6E, false, this)">Gris Macadan</button>
                 <button class="btn" onclick="updateColor(0x373737, false, this)">Gris Sombra</button>
             </div>
             <a href="https://mobili.ar" target="_blank" class="btn-cta">CONSULTAR PRESUPUESTO</a>
@@ -83,47 +79,45 @@
 
         function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xeeeeee);
+            scene.background = new THREE.Color(0xf0f0f0);
             camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
             renderer.shadowMap.enabled = true;
             document.body.appendChild(renderer.domElement);
 
             const loader = new THREE.TextureLoader();
-            woodTexture = loader.load('https://www.transparenttextures.com/patterns/wood-pattern.png');
-            woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
-            woodTexture.repeat.set(4, 4);
+            // Nueva textura de madera más limpia para evitar las líneas negras
+            woodTexture = loader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/floors/FloorsCheckerboard_S_Diffuse.jpg'); 
+            // Nota: En un servidor real usaríamos una imagen de veta .jpg limpia. 
 
-            scene.add(new THREE.GridHelper(20, 40, 0xbbbbbb, 0xdddddd));
+            scene.add(new THREE.GridHelper(20, 40, 0xcccccc, 0xdddddd));
             group = new THREE.Group();
-            materialMueble = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
-            const steel = new THREE.MeshStandardMaterial({ color: 0x999999, metalness: 0.8, roughness: 0.2 });
+            materialMueble = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+            const steel = new THREE.MeshStandardMaterial({ color: 0x999999, metalness: 0.9, roughness: 0.1 });
 
-            // BAJO MESADA
+            // MUEBLES
             const bajo = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.9, 0.6), materialMueble);
-            bajo.position.y = -0.5; bajo.castShadow = true; bajo.receiveShadow = true;
-            
-            // BACHA REALISTA
-            const bacha = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.05, 0.4), steel);
+            bajo.position.y = -0.5; bajo.castShadow = true;
+
+            const bacha = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.02, 0.4), steel);
             bacha.position.set(0.5, 0.46, 0.05); bajo.add(bacha);
 
-            // GRIFO REALISTA
-            const faucetBase = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.25), steel);
-            faucetBase.position.set(0.5, 0.58, -0.1); bajo.add(faucetBase);
-            const faucetCurv = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.02, 16, 100, Math.PI), steel);
-            faucetCurv.position.set(0.5, 0.7, -0.1); faucetCurv.rotation.z = Math.PI/2; bajo.add(faucetCurv);
+            const faucet = new THREE.Group();
+            const f1 = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.3), steel);
+            const f2 = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.02, 12, 24, Math.PI), steel);
+            f2.position.y = 0.15; f2.rotation.z = Math.PI/2;
+            faucet.add(f1, f2); faucet.position.set(0.5, 0.6, -0.1);
+            bajo.add(faucet);
 
-            // ALACENA
             const ala = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.7, 0.35), materialMueble);
             ala.position.y = 1.2; ala.castShadow = true;
 
             group.add(bajo, ala);
             scene.add(group);
 
-            const light = new THREE.DirectionalLight(0xffffff, 1.2);
-            light.position.set(5, 10, 5); light.castShadow = true;
+            const light = new THREE.DirectionalLight(0xffffff, 1.3);
+            light.position.set(5, 10, 7); light.castShadow = true;
             scene.add(light, new THREE.AmbientLight(0xffffff, 0.6));
 
             camera.position.set(0, 0.6, 6); render();
@@ -144,7 +138,7 @@
         }
 
         function render() { requestAnimationFrame(render); if(group) group.rotation.y += 0.003; renderer.render(scene, camera); }
-        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        window.onresize = () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); };
         init();
     </script>
 </body>

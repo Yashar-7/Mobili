@@ -189,7 +189,7 @@
       white-space: nowrap;
       pointer-events: none;
       transform: translate(-50%, -50%);
-      z-index: 5;
+      z-index: 4;
       box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
       animation: hologram-pulse 2s ease-in-out infinite;
     }
@@ -214,6 +214,7 @@
       border: 1px solid var(--cyan);
       border-radius: 14px;
       box-shadow: 0 0 30px rgba(0, 212, 255, 0.08);
+      z-index: 15;
     }
     .panel-materials h3 {
       font-size: 0.6rem;
@@ -222,6 +223,9 @@
       color: var(--white);
       text-transform: uppercase;
       margin-bottom: 1rem;
+    }
+    .panel-materials-toggle {
+      display: none;
     }
     .material-btn {
       display: block;
@@ -327,25 +331,84 @@
         height: 100%;
       }
       .panel-materials {
+        top: 0.5rem;
         right: 0.5rem;
-        width: 160px;
-        padding: 0.9rem;
+        left: 0.5rem;
+        width: auto;
+        transform: none;
+        padding: 0.5rem 0.6rem;
+        background: rgba(0, 31, 63, 0.75);
+        border-radius: 10px;
+        z-index: 15;
       }
-      .dim-label { font-size: 0.58rem; padding: 0.3rem 0.5rem; }
-      .cta-bar {
-        flex-direction: column;
-        margin-top: 1rem;
-        padding: 0 0.75rem;
+      .panel-materials-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         width: 100%;
-        max-width: 320px;
-        margin-left: auto;
-        margin-right: auto;
+        padding: 0.35rem 0;
+        background: none;
+        border: none;
+        color: var(--white);
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.6rem;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      .panel-materials-toggle svg {
+        width: 18px;
+        height: 18px;
+        transition: transform 0.25s ease;
+      }
+      .panel-materials.collapsed .panel-materials-toggle svg {
+        transform: rotate(-90deg);
+      }
+      .panel-materials-body {
+        display: none;
+      }
+      .panel-materials:not(.collapsed) .panel-materials-body {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-top: 0.5rem;
+      }
+      .panel-materials:not(.collapsed) .panel-materials-body .material-btn {
+        flex: 1 1 calc(50% - 0.2rem);
+        min-width: 0;
+        padding: 0.4rem 0.5rem;
+        font-size: 0.58rem;
+        margin-bottom: 0;
+      }
+      .panel-materials h3 {
+        display: none;
+      }
+      .dim-label {
+        font-size: 0.55rem;
+        padding: 0.25rem 0.45rem;
+        z-index: 4;
+      }
+      .cta-bar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.6rem;
+        padding: 0 0.5rem;
+        max-width: 100%;
+        justify-content: center;
       }
       .cta {
-        width: 100%;
-        padding: 0.6rem 1rem;
-        font-size: 0.6rem;
-        letter-spacing: 0.1em;
+        flex: 1 1 calc(50% - 0.2rem);
+        min-width: 120px;
+        max-width: 48%;
+        padding: 0.45rem 0.6rem;
+        font-size: 0.52rem;
+        letter-spacing: 0.06em;
+      }
+      .cta-ar {
+        flex: 1 1 100%;
+        max-width: 100%;
       }
     }
   </style>
@@ -377,12 +440,18 @@
       <div class="dim-label" id="labelFrente">Frente: 2.50 m</div>
       <div class="dim-label" id="labelAltura">Altura: 2.20 m</div>
       <div class="dim-label" id="labelProf">Profundidad: 0.60 m</div>
-      <div class="panel-materials">
-      <h3>Material</h3>
-      <button type="button" class="material-btn active" data-mat="blanco">Blanco Nórdico</button>
-      <button type="button" class="material-btn" data-mat="negro">Negro Brillante</button>
-      <button type="button" class="material-btn" data-mat="roble">Roble Natural</button>
-      <button type="button" class="material-btn" data-mat="nogal">Nogal Oscuro</button>
+      <div class="panel-materials collapsed" id="panelMaterials">
+        <h3>Material</h3>
+        <button type="button" class="panel-materials-toggle" id="panelMaterialsToggle" aria-label="Abrir menú materiales">
+          <span>Material</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="panel-materials-body">
+          <button type="button" class="material-btn active" data-mat="blanco">Blanco Nórdico</button>
+          <button type="button" class="material-btn" data-mat="negro">Negro Brillante</button>
+          <button type="button" class="material-btn" data-mat="roble">Roble Natural</button>
+          <button type="button" class="material-btn" data-mat="nogal">Nogal Oscuro</button>
+        </div>
       </div>
     </div>
 
@@ -449,6 +518,15 @@
         }, 1800);
       });
 
+      var panelMaterials = document.getElementById('panelMaterials');
+      var panelMaterialsToggle = document.getElementById('panelMaterialsToggle');
+      if (panelMaterialsToggle) {
+        panelMaterialsToggle.addEventListener('click', function (e) {
+          e.stopPropagation();
+          panelMaterials.classList.toggle('collapsed');
+        });
+      }
+
       // ——— Three.js ———
       var canvas3d = document.getElementById('canvas3d');
       var width = canvas3d.clientWidth;
@@ -462,7 +540,7 @@
       var camAngleY = 0.35;
       var camAngleX = 0.5;
       function isNarrow() { return window.innerWidth <= 768; }
-      function getCamDistance() { return isNarrow() ? 4.8 : 3.8; }
+      function getCamDistance() { return isNarrow() ? 5.5 : 3.8; }
       function getFov() { return isNarrow() ? 55 : 50; }
       camDistance = getCamDistance();
       function updateCamera() {
@@ -742,7 +820,7 @@
         camera.aspect = w / h;
         camera.fov = getFov();
         camera.updateProjectionMatrix();
-        if (isNarrow() && camDistance < 4.5) camDistance = 4.8;
+        if (isNarrow() && camDistance < 5.2) camDistance = 5.5;
         updateCamera();
         renderer.setSize(w, h);
       });

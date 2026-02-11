@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MOBILI | Showroom Final</title>
+    <title>MOBILI | High Definition</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
         :root { --blue-mobili: #004a99; --dark: #0a1f33; --bg-scene: #ececec; }
@@ -20,9 +20,9 @@
         .left-door { border-right: 2px solid var(--blue-mobili); }
         .right-door { border-left: 2px solid var(--blue-mobili); }
         
-        .handle { width: 8px; height: 250px; background: linear-gradient(to right, #ccc, #eee, #bbb); border-radius: 4px; position: absolute; }
-        .left-door .handle { right: 15px; }
-        .right-door .handle { left: 15px; }
+        .handle-door { width: 8px; height: 250px; background: linear-gradient(to right, #ccc, #eee, #bbb); border-radius: 4px; position: absolute; }
+        .left-door .handle-door { right: 15px; }
+        .right-door .handle-door { left: 15px; }
 
         #ui-layer { position: fixed; inset: 0; z-index: 100; pointer-events: none; display: flex; flex-direction: column; opacity: 0; transition: 1s; }
         .tag { position: absolute; background: white; border: 1.5px solid var(--blue-mobili); color: var(--blue-mobili); font-family: 'Roboto Mono'; font-size: 11px; font-weight: bold; padding: 5px 10px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
@@ -40,11 +40,11 @@
     <div id="splash" onclick="openShowroom()">
         <div class="door left-door">
             <div class="logo-container"><div class="logo-square"><div class="logo-inner"></div></div><div class="logo-text">MOBILI</div></div>
-            <div class="handle"></div>
+            <div class="handle-door"></div>
         </div>
         <div class="door right-door">
             <div class="logo-container"><div class="logo-square"><div class="logo-inner"></div></div><div class="logo-text">MOBILI</div></div>
-            <div class="handle"></div>
+            <div class="handle-door"></div>
         </div>
     </div>
 
@@ -58,19 +58,20 @@
             <div class="tag" style="bottom: 15%; right: 8%;">PROF: 0.60m</div>
         </div>
         <div class="footer">
-            <button class="btn active" onclick="updateColor(0xffffff, false, this)">Blanco Brillante</button>
-            <button class="btn" onclick="updateColor(0xBDB7AB, false, this)">Gris Arcilla</button>
-            <button class="btn" onclick="updateColor(0x1A1A1A, false, this)">Negro Brillante</button>
-            <button class="btn" onclick="updateColor(0x78726F, false, this)">Gris Tapir</button>
-            <button class="btn" onclick="updateColor(0xE8C499, true, this)">Madera Natural</button>
-            <button class="btn" onclick="updateColor(0x373737, false, this)">Gris Sombra</button>
+            <button class="btn active" onclick="updateColor(0xffffff, this)">Blanco Brillante</button>
+            <button class="btn" onclick="updateColor(0xBDB7AB, this)">Gris Arcilla</button>
+            <button class="btn" onclick="updateColor(0x1A1A1A, this)">Negro Brillante</button>
+            <button class="btn" onclick="updateColor(0x78726F, this)">Gris Tapir</button>
+            <button class="btn" onclick="updateColor(0xE0E0E0, this)">Ceniza</button>
+            <button class="btn" onclick="updateColor(0x6B6D6E, this)">Gris Macadan</button>
+            <button class="btn" onclick="updateColor(0x373737, this)">Gris Sombra</button>
         </div>
         <a href="https://mobili.ar" target="_blank" class="btn-cta">CONSULTAR PRESUPUESTO</a>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        let scene, camera, renderer, group, materialMueble, woodTexture;
+        let scene, camera, renderer, group, materialMueble;
 
         function init() {
             scene = new THREE.Scene();
@@ -81,12 +82,6 @@
             renderer.shadowMap.enabled = true;
             document.body.appendChild(renderer.domElement);
 
-            const loader = new THREE.TextureLoader();
-            woodTexture = loader.load('https://www.transparenttextures.com/patterns/wood-pattern.png');
-            woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
-            woodTexture.repeat.set(5, 5); // Veta más fina
-
-            // ELIMINACIÓN DE LÍNEAS: Bajamos el grid para que no toque el mueble
             const grid = new THREE.GridHelper(20, 40, 0xcccccc, 0xdddddd);
             grid.position.y = -1.05; 
             scene.add(grid);
@@ -95,9 +90,15 @@
             materialMueble = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
             const steel = new THREE.MeshStandardMaterial({ color: 0x999999, metalness: 0.8, roughness: 0.2 });
 
+            // BAJO MESADA
             const bajo = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.9, 0.6), materialMueble);
             bajo.position.y = -0.55; bajo.castShadow = true;
             
+            // MANIJA BAJO MESADA
+            const h1 = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.03, 0.04), steel);
+            h1.position.set(0, 0.4, 0.31); bajo.add(h1);
+
+            // BACHA Y GRIFO
             const bacha = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.05, 0.4), steel);
             bacha.position.set(0.5, 0.46, 0.05); bajo.add(bacha);
 
@@ -107,8 +108,13 @@
             f2.position.y = 0.12; f2.rotation.z = Math.PI/2;
             faucet.add(f1, f2); faucet.position.set(0.5, 0.58, -0.1); bajo.add(faucet);
 
+            // ALACENA
             const ala = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.7, 0.35), materialMueble);
             ala.position.y = 1.1; ala.castShadow = true;
+
+            // MANIJA ALACENA (RECUPERADA)
+            const h2 = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.03, 0.04), steel);
+            h2.position.set(0, -0.3, 0.18); ala.add(h2);
 
             group.add(bajo, ala);
             scene.add(group);
@@ -126,10 +132,8 @@
             setTimeout(() => { document.getElementById('splash').style.display = 'none'; document.getElementById('ui-layer').style.opacity = '1'; }, 1000);
         }
 
-        function updateColor(color, hasTexture, btn) {
+        function updateColor(color, btn) {
             materialMueble.color.setHex(color);
-            materialMueble.map = hasTexture ? woodTexture : null;
-            materialMueble.needsUpdate = true;
             document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         }

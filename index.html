@@ -3,73 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MOBILI — INTERACTIVE SHOWROOM</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>Mobili Interactive — Ingeniería 3D</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
-        :root { --cyan: #00d4ff; --bg: #000a1a; }
+        :root { --brand: #1a1a1a; --accent: #004a99; --bg: #ffffff; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: white; font-family: 'Montserrat', sans-serif; overflow: hidden; height: 100vh; }
+        body { background: var(--bg); color: var(--brand); font-family: 'Montserrat', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* BIENVENIDA: PUERTAS DE FÁBRICA */
+        /* BIENVENIDA ESTILO MOBILI */
         #splash {
-            position: fixed; inset: 0; background: #fff; z-index: 2000;
+            position: fixed; inset: 0; background: #ffffff; z-index: 2000;
             display: flex; justify-content: center; align-items: center;
-            transition: 1.5s cubic-bezier(0.7, 0, 0.3, 1);
+            transition: 1.5s cubic-bezier(0.8, 0, 0.2, 1);
         }
         .door {
-            position: absolute; width: 50%; height: 100%; background: #fdfdfd;
+            position: absolute; width: 50%; height: 100%; background: #ffffff;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            border: 1px solid #ddd; transition: 1.5s ease-in-out;
+            border: 1px solid #f5f5f5; transition: 1.5s ease-in-out;
         }
-        .left-door { left: 0; border-right: 2px solid var(--cyan); }
-        .right-door { right: 0; border-left: 2px solid var(--cyan); }
-        .handle { width: 12px; height: 300px; background: linear-gradient(90deg, #999, #eee, #999); border-radius: 10px; box-shadow: 0 0 20px rgba(0,212,255,0.5); }
+        .left-door { left: 0; border-right: 1px solid #ddd; }
+        .right-door { right: 0; border-left: 1px solid #ddd; }
         
-        .instruction { position: absolute; bottom: 15%; color: #555; font-size: 0.7rem; letter-spacing: 3px; cursor: pointer; z-index: 2001; font-weight: bold; }
+        .logo-img { width: 180px; margin-bottom: 30px; }
+        .door-handle { width: 4px; height: 250px; background: #ccc; border-radius: 2px; }
 
-        /* INTERFAZ OVERLAY */
-        .ui-system { position: fixed; inset: 0; z-index: 100; pointer-events: none; opacity: 0; transition: 2s; }
-        .header-tech { position: absolute; top: 20px; left: 20px; border-left: 3px solid var(--cyan); padding-left: 15px; }
-        .header-tech h1 { font-size: 1.2rem; letter-spacing: 5px; }
-        .header-tech p { font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--cyan); }
-
-        /* ETIQUETAS DE MEDIDA */
-        .measure-tag {
-            position: absolute; font-family: 'JetBrains Mono'; color: var(--cyan);
-            font-size: 0.65rem; padding: 5px 10px; background: rgba(0,0,0,0.8);
-            border: 1px solid var(--cyan); pointer-events: none;
+        /* UI OVERLAY */
+        .ui-container { position: fixed; inset: 0; z-index: 100; pointer-events: none; opacity: 0; transition: 2s; }
+        .top-bar { position: absolute; top: 30px; left: 30px; border-left: 2px solid var(--brand); padding-left: 20px; }
+        .top-bar h1 { font-size: 0.9rem; letter-spacing: 6px; text-transform: uppercase; font-weight: 600; }
+        
+        .measure {
+            position: absolute; font-family: 'JetBrains Mono'; font-size: 0.6rem;
+            color: var(--accent); background: rgba(255,255,255,0.9);
+            padding: 5px 10px; border: 1px solid #ddd; pointer-events: none;
         }
 
-        .footer-nav { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; gap: 20px; pointer-events: all; }
-        .btn-smart { padding: 12px 30px; border: 1px solid var(--cyan); color: white; text-decoration: none; font-size: 0.7rem; font-weight: bold; letter-spacing: 2px; transition: 0.3s; background: rgba(0,212,255,0.1); }
-        .btn-smart:hover { background: var(--cyan); color: #000; box-shadow: 0 0 30px var(--cyan); }
+        .bottom-bar { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; gap: 15px; pointer-events: all; }
+        .btn-mobili {
+            background: white; border: 1px solid #1a1a1a; color: #1a1a1a;
+            padding: 12px 25px; font-size: 0.7rem; font-weight: 600; letter-spacing: 2px;
+            cursor: pointer; transition: 0.3s; text-transform: uppercase;
+        }
+        .btn-mobili:hover { background: #1a1a1a; color: white; }
 
         #canvas-wrap { position: absolute; inset: 0; z-index: 1; }
     </style>
 </head>
 <body>
 
-    <div id="splash" onclick="openShowroom()">
-        <div class="door left-door"><div class="handle"></div></div>
-        <div class="door right-door"><div class="handle"></div></div>
-        <div class="instruction">CLICK PARA ABRIR SHOWROOM MOBILI</div>
+    <div id="splash" onclick="unlock()">
+        <div class="door left-door">
+            <img src="https://mobili.ar/wp-content/uploads/2022/11/logo-mobili.png" class="logo-img" alt="Mobili">
+            <div class="door-handle"></div>
+        </div>
+        <div class="door right-door">
+            <img src="https://mobili.ar/wp-content/uploads/2022/11/logo-mobili.png" class="logo-img" alt="Mobili" style="opacity:0">
+            <div class="door-handle"></div>
+        </div>
+        <div style="position:absolute; bottom:12%; font-size:0.6rem; letter-spacing:4px; font-weight:600; color:#888; cursor:pointer; z-index:2001;">[ INICIAR CONFIGURADOR ]</div>
     </div>
 
-    <div class="ui-system" id="ui">
-        <div class="header-tech">
-            <h1>MOBILI</h1>
-            <p>MÓDULO DE INGENIERÍA 3D // SMART TECH</p>
+    <div class="ui-container" id="ui">
+        <div class="top-bar">
+            <h1>Mobili Interactive</h1>
+            <p style="font-size: 0.5rem; letter-spacing: 2px; color: #666; margin-top: 5px;">MÓDULO DE VISUALIZACIÓN TÉCNICA</p>
         </div>
 
-        <div class="measure-tag" style="top: 25%; right: 20%;">ALACENA: 2.50m x 0.70m</div>
-        <div class="measure-tag" style="top: 60%; right: 15%;">BAJO MESADA: 2.50m x 0.90m</div>
-        <div class="measure-tag" style="bottom: 20%; left: 20%;">PROFUNDIDAD: 0.60m</div>
+        <div class="measure" style="top: 25%; left: 70%;">ALACENA: 2.50m</div>
+        <div class="measure" style="top: 60%; left: 75%;">BAJO MESADA: 0.90m</div>
 
-        <div class="footer-nav">
-            <a href="#" class="btn-smart" onclick="updateMat(0xfaf8f5)">BLANCO</a>
-            <a href="#" class="btn-smart" onclick="updateMat(0x1a1a1a)">NEGRO</a>
-            <a href="#" class="btn-smart" onclick="updateMat(0xb58e58)">ROBLE</a>
-            <a href="#" class="btn-smart" style="background:white; color:black;">COTIZAR</a>
+        <div class="bottom-bar">
+            <button class="btn-mobili" onclick="setCol(0xffffff)">Blanco Polar</button>
+            <button class="btn-mobili" onclick="setCol(0x2c2c2c)">Gris Grafito</button>
+            <button class="btn-mobili" onclick="setCol(0xdfc4a3)">Haya Natural</button>
+            <button class="btn-mobili" style="background: #1a1a1a; color: white;">Cotizar Proyecto</button>
         </div>
     </div>
 
@@ -77,47 +84,58 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        let scene, camera, renderer, group, matMueble;
+        let scene, camera, renderer, kitchenGroup, materialMueble;
 
         function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x000a1a);
+            scene.background = new THREE.Color(0xffffff); // Fondo blanco puro como la web
             
             camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('mainCanvas'), antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            // 1. RECUERDA EL GRID AZUL (El piso técnico)
-            const grid = new THREE.GridHelper(20, 40, 0x00d4ff, 0x002244);
-            grid.position.y = -1;
+            // EL SUELO TÉCNICO: Blanco con rejilla gris suave
+            const grid = new THREE.GridHelper(20, 40, 0x1a1a1a, 0xeeeeee);
+            grid.position.y = -1.2;
             scene.add(grid);
 
-            // 2. EL MUEBLE COMPLETO
-            group = new THREE.Group();
-            matMueble = new THREE.MeshStandardMaterial({ color: 0xfaf8f5, roughness: 0.3, metalness: 0.1 });
+            // EL MUEBLE
+            kitchenGroup = new THREE.Group();
+            materialMueble = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+            const steelMat = new THREE.MeshStandardMaterial({ color: 0x999999, metalness: 0.8, roughness: 0.2 });
 
             // Bajo Mesada
-            const bajo = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.9, 0.6), matMueble);
-            bajo.position.y = -0.1;
+            const bajo = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.9, 0.6), materialMueble);
+            bajo.position.y = -0.3;
             
             // Alacena
-            const alacena = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.7, 0.35), matMueble);
+            const alacena = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.7, 0.35), materialMueble);
             alacena.position.y = 1.3;
 
-            group.add(bajo, alacena);
-            scene.add(group);
+            // MANIJAS LONGITUDINALES (Perfil de acero)
+            function addManija(parent, yPos, zPos) {
+                const manija = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.03, 0.03), steelMat);
+                manija.position.set(0, yPos, zPos);
+                parent.add(manija);
+            }
 
-            // 3. ILUMINACIÓN NEÓN
-            const light = new THREE.PointLight(0x00d4ff, 1.5, 20);
-            light.position.set(2, 3, 4);
-            scene.add(light, new THREE.AmbientLight(0xffffff, 0.5));
+            addManija(bajo, 0.4, 0.31); // Manija bajo mesada
+            addManija(alacena, -0.3, 0.18); // Manija alacena
 
-            camera.position.set(4, 2, 6);
+            kitchenGroup.add(bajo, alacena);
+            scene.add(kitchenGroup);
+
+            // ILUMINACIÓN PROFESIONAL
+            const sun = new THREE.DirectionalLight(0xffffff, 1);
+            sun.position.set(5, 10, 7.5);
+            scene.add(sun, new THREE.AmbientLight(0xffffff, 0.8));
+
+            camera.position.set(4, 2, 7);
             camera.lookAt(0, 0.5, 0);
             animate();
         }
 
-        function openShowroom() {
+        function unlock() {
             document.querySelector('.left-door').style.transform = 'translateX(-100%)';
             document.querySelector('.right-door').style.transform = 'translateX(100%)';
             document.getElementById('splash').style.opacity = '0';
@@ -127,11 +145,11 @@
             }, 1000);
         }
 
-        function updateMat(col) { matMueble.color.setHex(col); }
+        function setCol(c) { materialMueble.color.setHex(c); }
 
         function animate() {
             requestAnimationFrame(animate);
-            if(group) group.rotation.y += 0.003; 
+            if(kitchenGroup) kitchenGroup.rotation.y += 0.002;
             renderer.render(scene, camera);
         }
 
@@ -143,4 +161,4 @@
         };
     </script>
 </body>
-</html>
+            </html>

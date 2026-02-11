@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mobili.ar — Cocina Modular 3D</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <title>Mobili.ar — Visualizador 3D</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
@@ -14,200 +12,205 @@
       --white: #ffffff;
       --mobili-blue: #001f3f;
       --cyan: #00d4ff;
-      --duration-door: 1.8s;
+      --cyan-glow: rgba(0, 212, 255, 0.4);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-    html, body {
-      height: 100%;
+    body {
+      height: 100vh;
+      width: 100vw;
       overflow: hidden;
-      background: radial-gradient(ellipse at center, #000a1a 0%, #0a0a12 50%, #000000 100%);
+      background: radial-gradient(circle at center, #000a1a 0%, #000000 100%);
       font-family: 'Montserrat', sans-serif;
       color: var(--white);
     }
 
-    /* ========== PARTÍCULAS ========== */
-    .particles-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-
-    /* ========== PUERTAS ========== */
-    #puertas-container { position: fixed; inset: 0; z-index: 1000; cursor: pointer; overflow: hidden; }
-    .puerta-izq, .puerta-der {
-      position: absolute; top: 0; bottom: 0; width: 50%; background: var(--white);
-      transition: transform var(--duration-door) cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .puerta-izq { left: 0; } .puerta-der { left: 50%; }
-    .puerta-izq.abrir { transform: translateX(-100%); }
-    .puerta-der.abrir { transform: translateX(100%); }
-
-    .manija {
-      position: absolute; top: 50%; transform: translateY(-50%); width: 8px; height: 160px;
-      background: rgba(200, 230, 255, 0.9); border-radius: 4px;
-      box-shadow: 0 0 20px var(--cyan), inset 0 0 15px white;
-    }
-    .puerta-izq .manija { right: 10px; } .puerta-der .manija { left: 10px; }
-
-    .logo-puertas { display: flex; align-items: center; gap: 1rem; }
-    .logo-square { width: 60px; height: 60px; border: 3px solid var(--mobili-blue); border-radius: 8px; }
-    .logo-text { font-weight: 700; letter-spacing: 0.3em; color: var(--mobili-blue); }
-
-    /* ========== MAIN APP ========== */
-    .main-wrap {
-      position: relative; z-index: 1; height: 100vh; width: 100vw;
-      display: flex; flex-direction: column; opacity: 0; visibility: hidden;
-      transition: opacity 1s ease;
-    }
-    .main-wrap.visible { opacity: 1; visibility: visible; }
-
-    .scene-wrap { position: relative; flex: 1; width: 100%; overflow: hidden; }
-    #canvas3d { width: 100%; height: 100%; touch-action: none; }
-
-    /* Etiquetas */
-    .dim-label {
-      position: absolute; font-size: 0.65rem; color: var(--white);
-      background: rgba(0, 31, 63, 0.85); padding: 0.3rem 0.6rem;
-      border-radius: 4px; border: 1px solid var(--cyan);
-      pointer-events: none; transform: translate(-50%, -50%); z-index: 10;
+    /* === HEADER DE MATERIALES (Cyber-Style) === */
+    .material-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(0, 15, 31, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--cyan);
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
     }
 
-    /* Panel Materiales Flotante (Desktop) */
-    .panel-materials {
-      position: absolute; top: 20px; right: 20px; width: 180px;
-      background: rgba(0, 31, 63, 0.8); backdrop-filter: blur(10px);
-      border: 1px solid var(--cyan); border-radius: 12px; padding: 1rem; z-index: 20;
+    .header-title {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      font-weight: 700;
     }
-    .panel-materials h3 { font-size: 0.7rem; letter-spacing: 0.1em; margin-bottom: 10px; text-transform: uppercase; }
+
+    .material-grid {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      max-width: 500px;
+    }
+
     .material-btn {
-      width: 100%; padding: 8px; margin-bottom: 5px; background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(0, 212, 255, 0.3); color: white; border-radius: 6px;
-      cursor: pointer; font-family: inherit; font-size: 0.7rem; text-align: left;
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      color: var(--white);
+      padding: 8px 4px;
+      font-size: 0.55rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
     }
-    .material-btn.active { border-color: var(--cyan); background: rgba(0, 212, 255, 0.2); }
 
-    /* Barra Inferior */
-    .cta-bar {
-      padding: 15px; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
-      display: flex; justify-content: center; gap: 10px; z-index: 30;
+    .material-btn.active {
+      background: var(--cyan-glow);
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan-glow);
     }
-    .cta {
-      padding: 12px 20px; font-size: 0.7rem; font-weight: 700; color: white;
-      text-decoration: none; border: 1px solid var(--cyan); border-radius: 8px;
-      background: rgba(0, 31, 63, 0.9); letter-spacing: 1px; transition: 0.3s;
-      display: flex; align-items: center; gap: 8px;
+
+    /* === ÁREA 3D === */
+    .scene-wrap {
+      position: absolute;
+      inset: 0; /* Ocupa todo el espacio */
+      z-index: 1;
     }
-    .cta:hover { background: var(--cyan); color: var(--black); }
-    .cta svg { width: 16px; height: 16px; fill: currentColor; }
+    #canvas3d { width: 100%; height: 100%; display: block; }
 
-    /* ========== MOBILE OPTIMIZATION ========== */
-    @media (max-width: 600px) {
-      .logo-puertas { flex-direction: column; text-align: center; }
-      
-      /* Materiales como burbujas horizontales arriba */
-      .panel-materials {
-        top: 10px; left: 10px; right: 10px; width: auto; 
-        padding: 8px; display: flex; align-items: center; gap: 8px;
-        background: rgba(0, 15, 31, 0.9);
-      }
-      .panel-materials h3 { display: none; }
-      .material-btn { 
-        margin-bottom: 0; padding: 6px 10px; font-size: 0.6rem; 
-        white-space: nowrap; flex: 1; text-align: center;
-      }
+    /* Etiquetas de Medidas */
+    .dim-label {
+      position: absolute;
+      font-family: 'JetBrains+Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--white);
+      background: rgba(0, 31, 63, 0.9);
+      padding: 4px 8px;
+      border: 1px solid var(--cyan);
+      border-radius: 4px;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      z-index: 10;
+    }
 
-      /* Barra inferior compacta */
-      .cta-bar { padding: 10px; flex-wrap: wrap; }
-      .cta { flex: 1 1 45%; padding: 10px; font-size: 0.55rem; justify-content: center; }
-      .cta-ar { flex: 1 1 100%; }
-      
-      .dim-label { font-size: 0.55rem; padding: 2px 5px; }
+    /* === BARRA INFERIOR (Footer) === */
+    .footer-actions {
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px;
+    }
+
+    .btn-main {
+      width: 100%;
+      max-width: 300px;
+      padding: 14px;
+      background: rgba(0, 31, 63, 0.9);
+      border: 1px solid var(--cyan);
+      color: var(--white);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      border-radius: 8px;
+      text-decoration: none;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .btn-ar {
+      background: var(--white);
+      color: var(--mobili-blue);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Partículas de fondo */
+    #particlesBg { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.4; }
+
+    @media (min-width: 768px) {
+      .material-header { padding: 15px 40px; flex-direction: row; justify-content: space-between; }
+      .footer-actions { flex-direction: row; justify-content: center; }
+      .btn-main { width: auto; min-width: 200px; }
     }
   </style>
 </head>
 <body>
-  <div class="particles-bg" id="particlesBg"></div>
+  <div id="particlesBg"></div>
 
-  <div id="puertas-container">
-    <div class="puerta-izq" id="puertaIzq">
-      <div class="logo-puertas">
-        <div class="logo-square"></div>
-        <div class="logo-text">MOBILI</div>
-      </div>
-      <div class="manija"></div>
+  <header class="material-header">
+    <div class="header-title">Personalización de Material</div>
+    <div class="material-grid">
+      <button class="material-btn active" data-mat="blanco">Blanco</button>
+      <button class="material-btn" data-mat="negro">Negro</button>
+      <button class="material-btn" data-mat="roble">Roble</button>
+      <button class="material-btn" data-mat="nogal">Nogal</button>
     </div>
-    <div class="puerta-der" id="puertaDer">
-      <div class="logo-puertas">
-        <div class="logo-square"></div>
-        <div class="logo-text">MOBILI</div>
-      </div>
-      <div class="manija"></div>
-    </div>
-  </div>
+  </header>
 
-  <div class="main-wrap" id="mainWrap">
-    <div class="scene-wrap" id="sceneWrap">
-      <canvas id="canvas3d"></canvas>
-      <div class="dim-label" id="labelFrente">Frente: 2.50 m</div>
-      <div class="dim-label" id="labelAltura">Altura: 2.20 m</div>
-      <div class="dim-label" id="labelProf">Prof: 0.60 m</div>
-      
-      <div class="panel-materials" id="panelMaterials">
-        <h3>Material</h3>
-        <button class="material-btn active" data-mat="blanco">Blanco</button>
-        <button class="material-btn" data-mat="negro">Negro</button>
-        <button class="material-btn" data-mat="roble">Roble</button>
-        <button class="material-btn" data-mat="nogal">Nogal</button>
-      </div>
-    </div>
+  <main class="scene-wrap" id="sceneWrap">
+    <canvas id="canvas3d"></canvas>
+    <div class="dim-label" id="labelFrente">2.50 m</div>
+    <div class="dim-label" id="labelAltura">2.20 m</div>
+    <div class="dim-label" id="labelProf">0.60 m</div>
+  </main>
 
-    <div class="cta-bar">
-      <button class="cta" id="btnCotizar">COTIZAR</button>
-      <a href="#" class="cta">SHOWROOM</a>
-      <a href="#" class="cta cta-ar">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-        AR PROJECT
-      </a>
-    </div>
-  </div>
+  <footer class="footer-actions">
+    <a href="#" class="btn-main">COTIZAR DISEÑO</a>
+    <a href="#" class="btn-main btn-ar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+      PROYECTAR AR
+    </a>
+  </footer>
 
   <script>
-    (function () {
-      // --- Puertas ---
-      document.getElementById('puertas-container').onclick = function() {
-        document.getElementById('puertaIzq').classList.add('abrir');
-        document.getElementById('puertaDer').classList.add('abrir');
-        document.getElementById('mainWrap').classList.add('visible');
-        setTimeout(() => this.style.display = 'none', 1800);
-      };
-
-      // --- Three.js ---
+    (function() {
       const canvas = document.getElementById('canvas3d');
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x000a1a);
-      
-      const camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
-      // Mueble simple para demo
-      const kitchen = new THREE.Group();
-      const matCabinet = new THREE.MeshStandardMaterial({ color: 0xfaf8f5 });
+      const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(3, 2, 5);
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+
+      // Mueble
+      const kitchenGroup = new THREE.Group();
+      const matCabinet = new THREE.MeshStandardMaterial({ color: 0xfaf8f5, roughness: 0.4 });
+      
       const body = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2.2, 0.6), matCabinet);
       body.position.y = 1.1;
-      kitchen.add(body);
-      scene.add(kitchen);
+      kitchenGroup.add(body);
+      scene.add(kitchenGroup);
 
-      const light = new THREE.HeimisphereLight(0xffffff, 0x444444, 1.2);
-      scene.add(light);
-      const spot = new THREE.DirectionalLight(0xffffff, 0.8);
-      spot.position.set(5, 5, 5);
-      scene.add(spot);
+      // Luces
+      const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+      scene.add(ambient);
+      const point = new THREE.PointLight(0x00d4ff, 1, 10);
+      point.position.set(2, 3, 2);
+      scene.add(point);
 
-      camera.position.set(0, 1.5, 5);
-      camera.lookAt(0, 1, 0);
-
-      // Materiales
+      // Interactividad de materiales
       const colors = { blanco: 0xfaf8f5, negro: 0x111111, roble: 0xb58e58, nogal: 0x5d4037 };
       document.querySelectorAll('.material-btn').forEach(btn => {
         btn.onclick = () => {
@@ -219,15 +222,15 @@
 
       function animate() {
         requestAnimationFrame(animate);
-        kitchen.rotation.y += 0.005;
+        kitchenGroup.rotation.y += 0.003;
         renderer.render(scene, camera);
       }
       animate();
 
       window.onresize = () => {
-        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.setSize(window.innerWidth, window.innerHeight);
       };
     })();
   </script>

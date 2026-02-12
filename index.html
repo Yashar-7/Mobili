@@ -6,17 +6,38 @@
     <title>SMART TECH | 3D Visualization Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
-        /* Estética Smart Tech: Negro y Cian Eléctrico */
         :root { --accent-cyan: #00f2ff; --dark-bg: #050505; --panel-bg: #111; --text-color: #e0e0e0; }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--dark-bg); font-family: 'Montserrat', sans-serif; overflow: hidden; height: 100vh; color: var(--text-color); }
 
-        /* Logo Estilo Smart Tech */
-        .logo-container { display: flex; align-items: center; gap: 10px; }
-        .logo-square { width: 35px; height: 35px; border: 2px solid var(--accent-cyan); display: flex; justify-content: center; align-items: center; border-radius: 4px; box-shadow: 0 0 10px var(--accent-cyan); }
-        .logo-inner { width: 12px; height: 12px; background: var(--accent-cyan); border-radius: 1px; animation: pulse 2s infinite; }
-        .logo-text { color: white; font-weight: 700; font-size: 22px; letter-spacing: 3px; text-transform: uppercase; font-family: 'Roboto Mono', monospace; }
+        /* Logo Estilo Rombo Smart Tech */
+        .logo-container { display: flex; align-items: center; gap: 15px; } /* Más espacio entre rombo y texto */
+        .logo-square { 
+            width: 30px; 
+            height: 30px; 
+            border: 2px solid var(--accent-cyan); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            transform: rotate(45deg); /* Esto crea el rombo */
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
+            transition: 0.3s;
+        }
+        .logo-inner { 
+            width: 10px; 
+            height: 10px; 
+            background: var(--accent-cyan); 
+            animation: pulse 2s infinite; 
+        }
+        .logo-text { 
+            color: white; 
+            font-weight: 700; 
+            font-size: 20px; 
+            letter-spacing: 3px; 
+            text-transform: uppercase; 
+            font-family: 'Roboto Mono', monospace; 
+        }
         
         @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
@@ -26,20 +47,23 @@
         .left-door { border-right: 2px solid var(--accent-cyan); }
         .right-door { border-left: 2px solid var(--accent-cyan); }
         
+        /* Ajuste de posición para que no choque con la manija */
+        .left-door .logo-container { margin-right: 60px; } 
+        .right-door .logo-container { margin-left: 60px; }
+
         .handle-door { width: 4px; height: 200px; background: var(--accent-cyan); box-shadow: 0 0 15px var(--accent-cyan); border-radius: 2px; position: absolute; }
-        .left-door .handle-door { right: 10px; }
-        .right-door .handle-door { left: 10px; }
+        .left-door .handle-door { right: 15px; }
+        .right-door .handle-door { left: 15px; }
 
         /* UI Layer */
-        #ui-layer { position: fixed; inset: 0; z-index: 100; pointer-events: none; display: flex; flex-direction: column; opacity: 0; transition: 1s; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%); }
-        .tag { position: absolute; background: rgba(0,0,0,0.7); border-left: 3px solid var(--accent-cyan); color: var(--accent-cyan); font-family: 'Roboto Mono'; font-size: 10px; padding: 6px 12px; border-radius: 0 4px 4px 0; backdrop-filter: blur(5px); }
+        #ui-layer { position: fixed; inset: 0; z-index: 100; pointer-events: none; display: flex; flex-direction: column; opacity: 0; transition: 1s; }
+        .tag { position: absolute; background: rgba(0,0,0,0.8); border-left: 3px solid var(--accent-cyan); color: var(--accent-cyan); font-family: 'Roboto Mono'; font-size: 10px; padding: 6px 12px; backdrop-filter: blur(5px); }
 
-        .footer { padding: 15px; background: rgba(10,10,10,0.9); display: flex; overflow-x: auto; gap: 10px; pointer-events: all; border-top: 1px solid #333; }
-        .btn { flex: 0 0 auto; padding: 12px 18px; border: 1px solid #333; background: #1a1a1a; font-size: 10px; font-weight: bold; cursor: pointer; color: #888; text-transform: uppercase; border-radius: 4px; transition: 0.3s; }
-        .btn.active { border-color: var(--accent-cyan); color: var(--accent-cyan); box-shadow: inset 0 0 10px rgba(0,242,255,0.1); }
+        .footer { padding: 15px; background: rgba(10,10,10,0.95); display: flex; overflow-x: auto; gap: 10px; pointer-events: all; border-top: 1px solid #333; }
+        .btn { flex: 0 0 auto; padding: 12px 18px; border: 1px solid #333; background: #1a1a1a; font-size: 10px; font-weight: bold; cursor: pointer; color: #888; text-transform: uppercase; border-radius: 4px; }
+        .btn.active { border-color: var(--accent-cyan); color: var(--accent-cyan); }
         
-        .btn-cta { display: block; width: 100%; background: var(--accent-cyan); color: black; border: none; text-decoration: none; text-align: center; padding: 18px; font-weight: 800; font-size: 12px; letter-spacing: 1px; pointer-events: all; transition: 0.3s; }
-        .btn-cta:hover { background: white; box-shadow: 0 0 20px white; }
+        .btn-cta { display: block; width: 100%; background: var(--accent-cyan); color: black; border: none; text-decoration: none; text-align: center; padding: 18px; font-weight: 800; font-size: 12px; letter-spacing: 1px; pointer-events: all; }
 
         canvas { display: block; }
     </style>
@@ -50,14 +74,14 @@
         <div class="door left-door">
             <div class="logo-container">
                 <div class="logo-square"><div class="logo-inner"></div></div>
-                <div class="logo-text">SMART_TECH</div>
+                <div class="logo-text">SMART</div>
             </div>
             <div class="handle-door"></div>
         </div>
         <div class="door right-door">
             <div class="logo-container">
+                <div class="logo-text">TECH</div>
                 <div class="logo-square"><div class="logo-inner"></div></div>
-                <div class="logo-text">3D_ENGINE</div>
             </div>
             <div class="handle-door"></div>
         </div>
@@ -65,7 +89,7 @@
 
     <div id="ui-layer">
         <div style="padding: 20px; text-align: center;">
-            <div class="logo-container" style="justify-content: center; transform: scale(0.7);">
+            <div class="logo-container" style="justify-content: center; transform: scale(0.8);">
                 <div class="logo-square"><div class="logo-inner"></div></div>
                 <div class="logo-text">SMART TECH VIZ</div>
             </div>
@@ -91,32 +115,29 @@
 
         function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0a0a0a); // Fondo oscuro pro
+            scene.background = new THREE.Color(0x0a0a0a);
             camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
             document.body.appendChild(renderer.domElement);
 
-            // Grilla estilo futurista
             const grid = new THREE.GridHelper(20, 40, 0x00f2ff, 0x222222);
             grid.position.y = -1.05; 
-            grid.material.opacity = 0.2;
+            grid.material.opacity = 0.15;
             grid.material.transparent = true;
             scene.add(grid);
 
             group = new THREE.Group();
-            materialMueble = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, metalness: 0.1 });
-            const chrome = new THREE.MeshStandardMaterial({ color: 0x00f2ff, metalness: 0.9, roughness: 0.1 });
+            materialMueble = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.15, metalness: 0.05 });
+            const chrome = new THREE.MeshStandardMaterial({ color: 0x00f2ff, metalness: 0.8, roughness: 0.2 });
 
-            // MODELO (Bajo mesada)
             const bajo = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.9, 0.6), materialMueble);
             bajo.position.y = -0.55; bajo.castShadow = true;
             
             const h1 = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.02, 0.04), chrome);
             h1.position.set(0, 0.4, 0.31); bajo.add(h1);
 
-            // ALACENA SUPERIOR
             const ala = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.7, 0.35), materialMueble);
             ala.position.y = 1.1; ala.castShadow = true;
 
@@ -126,8 +147,7 @@
             group.add(bajo, ala);
             scene.add(group);
 
-            // Luces de estudio
-            const light = new THREE.DirectionalLight(0xffffff, 1.5);
+            const light = new THREE.DirectionalLight(0xffffff, 1.4);
             light.position.set(5, 10, 5); 
             scene.add(light, new THREE.AmbientLight(0xffffff, 0.5));
 
